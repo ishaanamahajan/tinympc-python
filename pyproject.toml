@@ -34,4 +34,5 @@ wheel.install-dir = "tinympc"
 [tool.scikit-build.cmake.define]
 TINYMPC_EXT_MODULE_NAME = "ext_tinympc"
 
+
 [tool.setuptools_scm]
