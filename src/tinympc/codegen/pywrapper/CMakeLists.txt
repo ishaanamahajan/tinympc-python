@@ -16,8 +16,8 @@ endif()
 set(TINY_SOURCES
     src/tiny_data.cpp
     src/tiny_main.cpp
-    # tinympc/admm.cpp
-    # tinympc/tiny_api.cpp
+    tinympc/admm.cpp
+    tinympc/tiny_api.cpp
 )
 
 # Create tinympc library
@@ -56,6 +56,6 @@ target_link_libraries(tinympcgen PRIVATE tinympcstatic)
 
 # Set output directories
 set_target_properties(tinympcgen PROPERTIES 
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
 )

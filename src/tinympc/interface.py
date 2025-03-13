@@ -205,7 +205,7 @@ class TinyMPC:
             f.write(types_content)
         
         # Copy required TinyMPC files (both headers and implementations)
-        for file in ["tiny_api.hpp", "admm.hpp", "tiny_api.cpp", "admm.cpp"]:
+        for file in ["tiny_api.hpp", "admm.hpp", "tiny_api.cpp", "admm.cpp", "tiny_api_constants.hpp"]:
             shutil.copy(os.path.join(core_headers_src, file), core_headers_dst)
         
         # Copy Eigen files to the correct location

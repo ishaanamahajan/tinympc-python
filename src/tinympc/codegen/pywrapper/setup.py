@@ -26,8 +26,6 @@ class CmdCMakeBuild(build_ext):
         build_args = []
         cfg = 'Debug' if self.debug else 'Release'
 
-        
-
         if system() != "Darwin":
             build_args += [f'--config={cfg}']
 
