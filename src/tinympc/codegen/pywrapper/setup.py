@@ -49,6 +49,15 @@ class CmdCMakeBuild(build_ext):
         check_call(['cmake', this_dir] + cmake_args, cwd=self.build_temp)
         check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+        self.build_lib = os.path.abspath(os.path.join(os.getcwd(), 'build', 
+                                                     f'lib.{self.plat_name}-cpython-{sys.version_info[0]}{sys.version_info[1]}'))
+        if not os.path.exists(self.build_lib):
+            os.makedirs(self.build_lib)
+        
+        ext_path = self.get_ext_fullpath(ext.name)
+        if not os.path.exists(os.path.dirname(ext_path)):
+            os.makedirs(os.path.dirname(ext_path))
+
 
 setup(
     name='tiny_codegen_ext',
