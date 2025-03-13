@@ -1,3 +1,10 @@
+import shutil
+import os
+
+# Clean out directory
+if os.path.exists("out"):
+    shutil.rmtree("out")
+
 import tinympc
 import numpy as np
 

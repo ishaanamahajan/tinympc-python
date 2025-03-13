@@ -186,14 +186,45 @@ class TinyMPC:
             codegen_folder_abs += os.path.sep
         status = self._solver.codegen(codegen_folder_abs, verbose)
         
-        # Copy include/* (Eigen lib) and tinympc/(admm.hpp/cpp, api.hpp/cpp, constants.hpp, and types.hpp)
-        # https://github.com/python/importlib_resources/issues/85
-        try:
-            handle = importlib.resources.files('tinympc.codegen').joinpath('codegen_src')
-        except AttributeError:
-            handle = importlib.resources.path('tinympc.codegen', 'codegen_src')
-        with handle as codegen_src_path:
-            shutil.copytree(codegen_src_path, codegen_folder_abs, dirs_exist_ok=True)
+        # Create necessary directories
+        os.makedirs(os.path.join(codegen_folder_abs, "tinympc"), exist_ok=True)
+        os.makedirs(os.path.join(codegen_folder_abs, "include"), exist_ok=True)
+        
+        # Copy core header files from build dependencies
+        core_headers_src = "./build/_deps/tinympc-src/src/tinympc"
+        core_headers_dst = os.path.join(codegen_folder_abs, "tinympc")
+        
+        # Copy and modify types.hpp to use correct Eigen include path
+        with open(os.path.join(core_headers_src, "types.hpp"), 'r') as f:
+            types_content = f.read()
+        # Replace Eigen includes with correct paths
+        types_content = types_content.replace('#include <Eigen.h>', '''#include <Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/LU>''')
+        with open(os.path.join(core_headers_dst, "types.hpp"), 'w') as f:
+            f.write(types_content)
+        
+        # Copy required TinyMPC files (both headers and implementations)
+        for file in ["tiny_api.hpp", "admm.hpp", "tiny_api.cpp", "admm.cpp"]:
+            shutil.copy(os.path.join(core_headers_src, file), core_headers_dst)
+        
+        # Copy Eigen files to the correct location
+        eigen_src = "./build/_deps/tinympc-src/include/Eigen"
+        eigen_dst = os.path.join(codegen_folder_abs, "include")
+        if os.path.exists(eigen_src):
+            # Copy the entire Eigen directory to include/
+            shutil.copytree(eigen_src, os.path.join(eigen_dst, "Eigen"), dirs_exist_ok=True)
+            
+            # Also copy all files from Eigen/Eigen/* to include/Eigen/
+            eigen_core_src = os.path.join(eigen_src, "Eigen")
+            if os.path.exists(eigen_core_src):
+                for item in os.listdir(eigen_core_src):
+                    s = os.path.join(eigen_core_src, item)
+                    d = os.path.join(eigen_dst, "Eigen", item)
+                    if os.path.isfile(s):
+                        shutil.copy2(s, d)
+                    else:
+                        shutil.copytree(s, d, dirs_exist_ok=True)
         
         # Copy pywrapper files (bindings.cpp, CMakeLists.txt, and setup.py)
         try:
